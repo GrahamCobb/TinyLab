@@ -284,7 +284,7 @@ void loop()
 
       Serial.print("Humax hostname = ");
       logToHttpResponse(&command.client, command.hostname);
-      if (0*humax_is_on(command.hostname)) {
+      if (humax_is_on(command.hostname)) {
         success = true;
         state = result;
       } else {
