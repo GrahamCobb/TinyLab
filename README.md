@@ -47,6 +47,8 @@ But I hope to eventually move it to running directly on a standalone ESP8266-bas
 
 ###Libraries
 
-* WiFiEsp
+* WiFiEsp - Note this requires a newer version of the WiFiEsp library in order to allow
+simultaneous inbound and outbound connections.
+See my issue #60 (and pull request #61) on the github page.
 
 * IRremote
