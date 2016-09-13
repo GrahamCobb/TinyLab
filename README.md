@@ -35,3 +35,18 @@ It is generally compatible with the standard WiFi library.
 * DS1307RTC - to control and use the RTC.
 
 * LedControl - to control the 7-segment LED.
+
+## HumaxPower
+This project is to turn on my Humax PVR under command from another system.
+When it receives the command (a web access to http://<arduino-IP>/poweron?humax=<humax-IP>) it
+transmits the Humax remote control POWER button infrared code.
+I plan to use this so that my Humax backups always work (not just when I am watching it so it is on).
+
+At the moment this is being prototyped on my TinyLab.
+But I hope to eventually move it to running directly on a standalone ESP8266-based board.
+
+###Libraries
+
+* WiFiEsp
+
+* IRremote
