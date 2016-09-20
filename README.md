@@ -37,7 +37,7 @@ It is generally compatible with the standard WiFi library.
 * LedControl - to control the 7-segment LED.
 
 ## HumaxPower
-This project is to turn on my Humax PVR under command from another system.
+This project is the prototype to turn on my Humax PVR under command from another system.
 When it receives the command (a web access to http://<arduino-IP>/poweron?humax=<humax-IP>) it
 transmits the Humax remote control POWER button infrared code.
 I plan to use this so that my Humax backups always work (not just when I am watching it so it is on).
@@ -52,3 +52,21 @@ simultaneous inbound and outbound connections.
 See my issue #60 (and pull request #61) on the github page.
 
 * IRremote
+
+## HumaxPowerOnThing
+This project is the completed version of HumaxPower.
+It turns on my Humax PVR under command from another system.
+When it receives the command (a web access to http://<arduino-IP>/poweron?humax=<humax-IP>) it
+transmits the Humax remote control POWER button infrared code.
+I use this so that my Humax backup scripts can turn on the Humax even if I am not watching it.
+
+This runs on the Sparkfun ESP8266 Thing (https://www.sparkfun.com/products/13231).
+Unlike the prototype (above) this uses the ESP8266WebServer library and so the code had
+to be refactored, but the code is now a bit simpler.
+
+###Libraries
+
+* ESP8266WebServer - and associated libraries.
+
+* IRremoteESP8266 - not part of the standard ESP8266 Arduino support package but available from
+https://github.com/markszabo/IRremoteESP8266
