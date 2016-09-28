@@ -24,13 +24,12 @@
 // Forward declarations
 void handleRoot();
 void handlePoweron();
+void handleIRtest();
 
 const int led_pin =  5;      // the number of the LED pin on the Sparkfun ESP8266 Thing
 const int ir_led_pin = 4;   // GPIO pin number for IR led
 #define HUMAX_POWER 0x800FF   // IR code for power button
 IRsend irsend(ir_led_pin);
-
-const unsigned long max_wait = 30 * 1000; // Maximum time for Humax to boot, in milliseconds
 
 // To specify your wifi settings here, comment out the #include below
 // and modify and uncomment the two lines below that
@@ -157,6 +156,7 @@ void loop()
         }
         server.on("/", handleRoot);
         server.on("/poweron", handlePoweron);
+        server.on("/irtest", handleIRtest);
         server.onNotFound([]() {
           server.send ( 404, "text/plain", "File not found" );
         } );
@@ -180,6 +180,7 @@ void loop()
       state = init;
   }
   
+  digitalWrite(led_pin, !digitalRead(led_pin)); // Toggle LED
   delay(1000);
   yield(); // Not necessary with delay above, but just in case we remove the delay...
 }
@@ -211,10 +212,13 @@ void handleRoot() {
 }
 
 void handlePoweron() {
+  unsigned long max_wait = 120 * 1000; // Maximum time for Humax to boot, in milliseconds
   char temp[400];
   bool nocheck = server.hasArg("nocheck"); // For testing
   bool nowait = server.hasArg("nowait"); // For testing
   digitalWrite(led_pin, HIGH);
+  
+  if (server.hasArg("timeout") && server.arg("timeout").length() > 0) max_wait = server.arg("timeout").toInt() * 1000;
   
   humax = server.arg("humax");
   if (humax && humax.length() > 0) {
@@ -240,7 +244,8 @@ void handlePoweron() {
       delay(5000);
       while (! (nowait || humax_is_on(humax.c_str()))) {
         if (millis() - start_wait > max_wait) {
-          Serial.println("Timeout");
+          Serial.print("Timeout ");
+          Serial.println((millis() - start_wait)/1000);
           server.send(408, "text/html",
 "<html>\
   <head>\
@@ -276,6 +281,40 @@ void handlePoweron() {
     server.send ( 400, "text/plain", "Must specify humax hostname" );
   }
   
+  digitalWrite(led_pin, LOW);
+}
+
+void handleIRtest() {
+  int interval=1000, duration=10000;
+  unsigned long start_wait = millis();
+  
+  digitalWrite(led_pin, HIGH);
+  digitalWrite(ir_led_pin, LOW);
+
+  if (server.hasArg("interval") && server.arg("interval").length() > 0) interval = server.arg("interval").toInt();
+  if (server.hasArg("duration") && server.arg("duration").length() > 0) duration = server.arg("duration").toInt();
+  Serial.print("IRtest: interval ");
+  Serial.print(interval);
+  Serial.print(", duration ");
+  Serial.println(duration);
+  
+  while ((millis() - start_wait) < duration) {
+    delay(interval);
+    digitalWrite(ir_led_pin, !digitalRead(ir_led_pin)); // Toggle IR LED
+  }
+
+  server.send(200, "text/html",
+"<html>\
+  <head>\
+    <title>HumaxPower on Thing</title>\
+  </head>\
+  <body>\
+    <p>IR test completed.</p>\
+  </body>\
+</html>"
+  );
+
+  digitalWrite(ir_led_pin, LOW);
   digitalWrite(led_pin, LOW);
 }
 
